@@ -1,0 +1,65 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% block title %}
+Products
+{% endblock title %}
+
+{% block content %}
+   <h1>Новости</h1>
+    <h2>Колличество новостей :{{posts|length}}</h2>
+{% if is_not_subscriber %}
+<p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться</a></p>
+
+{% endif %}
+   <hr>
+   {% if posts %}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Дата публикации</td>
+               <td>Статья</td>
+           </tr>{{ post.title|censor }}</td>
+               <td>{{ post.dateCreation|date:' d M Y' }}</td>
+
+           {% for post in category_news_list %}
+         <li class="list-group-item">
+           <small class="fw-bold">{{ post.dateCreation|date:' d M Y' }}</small>
+           <td>{{ post.title|censor }}</td>
+           <small class="text-muted">(автор: {{ post.author}})</small><br>
+           <small class="fw-bold">категории:
+           {% for category in post.category.all %}
+           {{category}}
+               <a href="{% usrl 'category_list' category.id%}">{{category}}</a>
+                {% endfor %}
+           </small>
+         <td>{{ post.text|truncatewords:20|censor }}</td>
+         </li>
+         {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Новостей нет!</h2>
+   {% endif %}
+   {# Добавляем пагинацию на страницу #}
+
+   {# Информация о предыдущих страницах #}
+   {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+{% endblock content %}
